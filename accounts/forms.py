@@ -1,4 +1,3 @@
-# accounts/forms.py
 from django import forms
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm, 
                                        PasswordResetForm, SetPasswordForm)
@@ -89,3 +88,18 @@ class SetPasswordForm(SetPasswordForm):
             'placeholder': 'Confirm new password',
             'class': self.input_class
         })
+
+
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('first_name', 'last_name', 'avatar')
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': INPUT_CLASSES}),
+            'last_name': forms.TextInput(attrs={'class': INPUT_CLASSES}),
+        }
+
+    avatar = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={
+        'class': 'mt-2 text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+    }))
