@@ -54,7 +54,7 @@
 
     <!-- Edit Profile Form -->
     <div id="edit-profile-form" class="hidden mt-4 border-t pt-4 space-y-4">
-      <form id="profileForm" enctype="multipart/form-data">
+      <form id="profileForm" enctype="multipart/form-data" data-update-url="{% url 'accounts:update_profile' %}">
         {% csrf_token %}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>

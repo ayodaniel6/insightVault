@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
     const toggleEditBtn = document.getElementById("toggle-edit-btn");
     const editProfileForm = document.getElementById("edit-profile-form");
@@ -16,8 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             const formData = new FormData(profileForm);
             const csrfToken = profileForm.querySelector('[name=csrfmiddlewaretoken]').value;
+            const updateUrl = profileForm.dataset.updateUrl;
 
-            fetch("{% url 'accounts:update_profile' %}", {
+            fetch(updateUrl, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": csrfToken
@@ -36,4 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
 });
+
+
+
