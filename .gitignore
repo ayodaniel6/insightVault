@@ -1,2 +1,43 @@
-.env
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+*.env
+
+# VSCode / PyCharm / IDE
+.vscode/
+.idea/
+
+# Django stuff
+*.log
+*.pot
+*.pyc
 db.sqlite3
+media/
+staticfiles/
+
+# If you use Django migrations cache
+*/migrations/__pycache__/
+
+# If you collect static
+/static/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
