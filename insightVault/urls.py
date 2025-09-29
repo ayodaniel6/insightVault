@@ -5,8 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # accounts app URLs
     path('auth/', include('accounts.urls')),
     path('api/accounts/', include('accounts.api.urls')),
+
+    # journal app URLs
+    path('journal/', include('journal.urls')),
 ]
 
 if settings.MEDIA_URL and settings.MEDIA_ROOT:

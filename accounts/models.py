@@ -32,6 +32,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True)
+
+    # --- Preferences (flexible JSON) ---
+    preferences = models.JSONField(default=dict, blank=True)
+
+    
+    # --- Permissions / Django Internals ---
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
