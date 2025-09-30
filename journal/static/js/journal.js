@@ -1,115 +1,144 @@
-// journal.js
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById("note-modal");
+  const form = document.getElementById("note-form");
+  const noteIdField = document.getElementById("note-id");
+  const modalTitle = document.getElementById("modal-title");
 
-// Panel for creating new note
-const createPanel = document.getElementById("createPanel");
-const openCreatePanelBtn = document.getElementById("openCreatePanel");
-const createNoteForm = document.getElementById("createNoteForm");
-
-// Modal for delete confirmation
-const deleteModal = document.getElementById("deleteModal");
-const deleteForm = document.getElementById("deleteForm");
-
-
-// ------------------ CREATE NOTE ------------------
-openCreatePanelBtn.onclick = () => {
-  createNoteForm.reset();
-  openCreatePanel();
-};
-
-function openCreatePanel() {
-  createPanel.classList.remove("translate-x-full");
-}
-function closeCreatePanel() {
-  createPanel.classList.add("translate-x-full");
-}
-
-createNoteForm.onsubmit = async function (e) {
-  e.preventDefault();
-  let formData = new FormData(this);
-  let res = await fetch("", {
-    method: "POST",
-    body: formData,
-    headers: { "X-Requested-With": "XMLHttpRequest" },
+  // ---- Open modal for new note ----
+  document.getElementById("new-entry-btn").addEventListener("click", () => {
+    form.reset();
+    noteIdField.value = "";
+    modalTitle.innerText = "New Entry";
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
   });
 
-  if (res.ok) {
-    location.reload(); // reload to reflect new note
-  }
-};
+  // ---- Edit note ----
+  window.editNote = function (noteId) {
+    fetch(`/journal/get/${noteId}/`, {
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const note = data.note;
+          noteIdField.value = note.id;
+          form.querySelector("[name=title]").value = note.title;
+          form.querySelector("[name=content]").value = note.content;
+          form.querySelector("[name=tags]").value = note.tags_list.join(", ");
+          form.querySelector("[name=pinned]").checked = note.pinned;
 
+          modalTitle.innerText = "Edit Entry";
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+        }
+      });
+  };
 
-// ------------------ EXPAND / COLLAPSE ------------------
-function toggleExpand(el) {
-  const card = el.closest(".note-card");
-  const preview = card.querySelector(".preview");
-  const editForm = card.querySelector(".edit-form");
+  // ---- Close modal ----
+  window.closeModal = function () {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  };
 
-  preview.classList.toggle("hidden");
-  editForm.classList.toggle("hidden");
-}
+  const saveNoteUrl = document.getElementById("new-entry-btn").dataset.saveUrl;
 
-
-// ------------------ EDIT NOTE ------------------
-async function submitEdit(e, id) {
-  e.preventDefault();
-  let formData = new FormData(e.target);
-  formData.append("note_id", id);
-
-  let res = await fetch("", {
-    method: "POST",
-    body: formData,
-    headers: { "X-Requested-With": "XMLHttpRequest" },
-  });
-
-  if (res.ok) {
-    location.reload(); // reload to show updates
-  }
-}
-
-
-// ------------------ DELETE NOTE ------------------
-function confirmDelete(id) {
-  deleteForm.onsubmit = async function (e) {
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
-    let res = await fetch(`/journal/delete/${id}/`, {
+    const formData = new FormData(form);
+
+    fetch(saveNoteUrl, {
+      method: "POST",
+      body: formData,
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.reload();
+      } else {
+        console.error(data.errors);
+      }
+    });
+  });
+
+
+  // ---- Delete note ----
+  window.deleteNote = function (noteId) {
+    if (!confirm("Are you sure you want to delete this note?")) return;
+
+    fetch(`/journal/delete/${noteId}/`, {
       method: "POST",
       headers: {
-        "X-CSRFToken": getCsrfToken(),
         "X-Requested-With": "XMLHttpRequest",
-      },
-    });
-    if (res.ok) {
-      location.reload(); // reload to update list
+        "X-CSRFToken": getCookie("csrftoken")
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById(`note-${noteId}`).remove();
+        } else {
+          console.error("Delete failed:", data.error);
+        }
+      });
+  };
+
+  // ---- Toggle pin ----
+  window.togglePin = function (noteId) {
+    fetch(`/journal/toggle-pin/${noteId}/`, {
+      method: "POST",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": getCookie("csrftoken")
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          console.error("Toggle pin failed:", data.error);
+        }
+      });
+  };
+
+  // ---- Expand/Collapse note content smoothly ----
+  window.expandNote = function (noteId, event) {
+    if (event.target.tagName === "BUTTON" || event.target.tagName === "A") return;
+
+    const container = document.getElementById(`note-content-${noteId}`);
+    const preview = container.querySelector(".note-preview");
+    const full = container.querySelector(".note-full");
+
+    if (full.style.maxHeight && full.style.maxHeight !== "0px") {
+      // Collapse
+      full.style.maxHeight = "0px";
+      setTimeout(() => {
+        full.classList.add("hidden");
+        preview.classList.remove("hidden");
+      }, 300);
     } else {
-      alert("Error while deleting note");
+      // Expand
+      preview.classList.add("hidden");
+      full.classList.remove("hidden");
+      full.style.maxHeight = full.scrollHeight + "px";
     }
   };
-  openModal("deleteModal");
-}
 
-
-// ------------------ PIN NOTE ------------------
-async function togglePin(id) {
-  let res = await fetch(`/journal/pin/${id}/`, {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": getCsrfToken(),
-      "X-Requested-With": "XMLHttpRequest",
-    },
-  });
-  if (res.ok) {
-    location.reload(); // reload so pinned goes to top
+  // ---- Helper: Get CSRF token ----
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
   }
-}
-
-
-// ------------------ HELPERS ------------------
-function openModal(id) {
-  document.getElementById(id).classList.remove("hidden");
-}
-function closeModal(id) {
-  document.getElementById(id).classList.add("hidden");
-}
-function getCsrfToken() {
-  return document.querySelector("[name=csrfmiddlewaretoken]").value;
-}
+});

@@ -16,16 +16,31 @@
   <nav class="flex justify-between items-center py-4 px-6 shadow-sm bg-white">
     <h1 class="text-xl font-bold tracking-tight text-indigo-600">InsightVault</h1>
     <div class="flex items-center gap-4">
-      {% if user.is_authenticated %}
-        <a href="{% url 'accounts:dashboard' %}" class="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">Dashboard</a>
-        <form action="{% url 'accounts:logout' %}" method="post">
+    {% if user.is_authenticated %}
+      <a href="{% url 'accounts:dashboard' %}" 
+        class="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">
+        Dashboard
+      </a>
+      
+      <a href="{% url 'journal:home' %}" 
+        class="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">
+        Journal
+      </a>
+      
+      <form action="{% url 'accounts:logout' %}" method="post">
         {% csrf_token %}
-        <button class="text-sm font-medium text-red-500 hover:text-red-700 transition">Logout</button>
-        </form>
-      {% else %}
-        <a href="{% url 'accounts:login' %}" class="text-sm font-medium text-indigo-500 hover:text-indigo-700 transition">Login</a>
-      {% endif %}
+        <button class="text-sm font-medium text-red-500 hover:text-red-700 transition">
+          Logout
+        </button>
+      </form>
+    {% else %}
+      <a href="{% url 'accounts:login' %}" 
+        class="text-sm font-medium text-indigo-500 hover:text-indigo-700 transition">
+        Login
+      </a>
+    {% endif %}
     </div>
+
   </nav>
 
   <!-- Flash messages -->

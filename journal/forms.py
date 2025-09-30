@@ -1,47 +1,51 @@
 from django import forms
 from .models import Note
 
-INPUT_CLASSES = """
-w-full px-4 py-2 rounded-xl border border-gray-300 
+# --- Shared Styles ---
+BASE_INPUT = """
+w-full px-4 py-2 rounded-lg border border-gray-200 
 focus:outline-none focus:ring-2 focus:ring-indigo-500 
-shadow-sm transition-all duration-200 ease-in-out
-focus:scale-[1.01]
+focus:border-indigo-500 transition-all duration-200 ease-in-out
 """
 
-CHECKBOX_CLASSES = """
+TEXTAREA_INPUT = f"{BASE_INPUT} h-40 resize-none leading-relaxed"
+
+TAG_INPUT = f"{BASE_INPUT} text-sm italic"
+
+CHECKBOX_INPUT = """
 h-4 w-4 text-indigo-600 border-gray-300 rounded 
-focus:ring-indigo-500
+focus:ring-indigo-500 transition-all duration-200
 """
 
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ['title', 'content', 'tags', 'pinned']  # Added new fields
+        fields = ['title', 'content', 'tags', 'pinned']
 
     def __init__(self, *args, **kwargs):
-        super(NoteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        # Title field
+        # --- Title ---
         self.fields['title'].widget.attrs.update({
-            'class': INPUT_CLASSES,
-            'placeholder': 'Give your note a title...'
+            "class": f"{BASE_INPUT} font-semibold text-gray-800",
+            "placeholder": "✏️ Give your note a title..."
         })
 
-        # Content field (textarea)
+        # --- Content ---
         self.fields['content'].widget.attrs.update({
-            'class': f"{INPUT_CLASSES} h-48 resize-none",
-            'placeholder': 'Start typing your thoughts, ideas, or plans here...'
+            "class": TEXTAREA_INPUT,
+            "placeholder": "💡 Start writing your thoughts here..."
         })
 
-        # Tags field (optional)
+        # --- Tags (optional) ---
         self.fields['tags'].required = False
         self.fields['tags'].widget.attrs.update({
-            'class': INPUT_CLASSES,
-            'placeholder': 'Comma-separated tags (optional)'
+            "class": TAG_INPUT,
+            "placeholder": "#tags, separated, by commas"
         })
 
-        # Pinned checkbox
+        # --- Pinned ---
         self.fields['pinned'].required = False
         self.fields['pinned'].widget.attrs.update({
-            'class': CHECKBOX_CLASSES
+            "class": CHECKBOX_INPUT
         })
