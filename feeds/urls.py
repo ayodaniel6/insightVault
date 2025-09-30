@@ -1,7 +1,11 @@
 from django.urls import path
-from . import api_views
+from . import views
+
+app_name = "feeds"
 
 urlpatterns = [
-    path('items/', api_views.FeedItemList.as_view(), name='feed_items'),
-    path('sources/', api_views.FeedSourceList.as_view(), name='feed_sources'),
+    path("", views.feed_list, name="feed_list"),
+    path("refresh/<slug:slug>/", views.refresh_source, name="refresh_source"),
+    path("refresh-all/", views.refresh_all, name="refresh_all"),
+    path("<int:pk>/", views.feed_detail, name="feed_detail"),
 ]

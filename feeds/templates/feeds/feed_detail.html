@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Feeds | InsightVault{% endblock %}
+
+{% block content %}
+
+<article class="bg-white shadow-sm rounded-lg border border-gray-100 p-6">
+  <h1 class="text-2xl font-bold text-indigo-600 mb-4">{{ item.title }}</h1>
+
+  <div class="flex justify-between text-sm text-gray-500 mb-6">
+    <span>Source: {{ item.source.name }}</span>
+    <span>{{ item.published_at|date:"M d, Y H:i" }}</span>
+  </div>
+
+  {% if item.image_url %}
+    <img src="{{ item.image_url }}" alt="thumbnail" 
+         class="rounded-lg mb-6 w-full max-h-80 object-cover">
+  {% endif %}
+
+  {% if item.video_url %}
+    <div class="mb-6 aspect-w-16 aspect-h-9">
+      <iframe src="{{ item.video_url }}" frameborder="0" 
+              allowfullscreen class="w-full h-full rounded-lg"></iframe>
+    </div>
+  {% endif %}
+
+  {% if item.content %}
+    <div class="prose max-w-none text-gray-700">
+      {{ item.content|safe }}
+    </div>
+  {% elif item.summary %}
+    <p class="text-gray-600">{{ item.summary }}</p>
+  {% else %}
+    <p class="italic text-gray-400">No content available.</p>
+  {% endif %}
+
+  <div class="mt-8 flex justify-between">
+    <a href="{% url 'feeds:feed_list' %}" class="text-sm text-gray-600 hover:text-indigo-500 transition">
+      ← Back to feeds
+    </a>
+    <a href="{{ item.url }}" target="_blank" class="text-sm text-indigo-500 hover:underline">
+      View Original ↗
+    </a>
+  </div>
+</article>
+{% endblock %}

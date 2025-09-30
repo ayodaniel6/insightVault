@@ -12,6 +12,9 @@ urlpatterns = [
 
     # journal app URLs
     path('journal/', include('journal.urls')),
+
+        # feeds app URLs
+    path('feeds/', include('feeds.urls')),
 ]
 
 if settings.MEDIA_URL and settings.MEDIA_ROOT:
